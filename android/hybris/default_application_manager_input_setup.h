@@ -191,11 +191,13 @@ public:
     }
 
     nsecs_t notifyANR(const sp<InputApplicationHandle>& inputApplicationHandle,
-                      const sp<InputWindowHandle>& inputWindowHandle)
+                      const sp<InputWindowHandle>& inputWindowHandle,
+		      const android::String8& reason)
     {
         REPORT_FUNCTION_CALL();
         (void) inputApplicationHandle;
         (void) inputWindowHandle;
+        (void) reason;
 
         return 0;
     }
