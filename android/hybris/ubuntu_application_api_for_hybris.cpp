@@ -39,7 +39,11 @@
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
 #include <ui/DisplayInfo.h>
+#if ANDROID_VERSION_MAJOR == 4 && ANDROID_VERSION_MINOR < 4
 #include <androidfw/InputTransport.h>
+#else
+#include <input/InputTransport.h>
+#endif
 #include <ui/PixelFormat.h>
 #include <ui/Region.h>
 #include <ui/Rect.h>

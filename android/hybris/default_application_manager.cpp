@@ -30,7 +30,11 @@
 
 #include <input/InputListener.h>
 #include <input/InputReader.h>
+#if ANDROID_VERSION_MAJOR == 4 && ANDROID_VERSION_MINOR < 4
 #include <androidfw/InputTransport.h>
+#else
+#include <input/InputTransport.h>
+#endif
 #include <utils/threads.h>
 #include <utils/Errors.h>
 #include <utils/Timers.h>
