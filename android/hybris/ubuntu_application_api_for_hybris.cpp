@@ -38,6 +38,7 @@
 #include <binder/ProcessState.h>
 #include <gui/ISurfaceComposer.h>
 #include <gui/SurfaceComposerClient.h>
+#include <gui/Surface.h>
 #include <ui/DisplayInfo.h>
 #include <androidfw/InputTransport.h>
 #include <ui/PixelFormat.h>
