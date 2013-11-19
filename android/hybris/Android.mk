@@ -29,6 +29,8 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SHARED_LIBRARIES := \
 	libandroidfw \
 	libbinder \
+	libinput \
+	liblog \
 	libutils \
 	libgui \
 	libEGL \
@@ -218,7 +220,7 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SHARED_LIBRARIES := \
 	libbinder \
-	libinput \
+	libinputservice \
 	libgui \
 	libskia \
 	libandroidfw \
