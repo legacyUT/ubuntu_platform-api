@@ -220,7 +220,9 @@ LOCAL_MODULE_TAGS := optional
 
 LOCAL_SHARED_LIBRARIES := \
 	libbinder \
+	libinput \
 	libinputservice \
+	liblog \
 	libgui \
 	libskia \
 	libandroidfw \
