@@ -312,7 +312,11 @@ struct UbuntuSurface : public ubuntu::application::ui::Surface
             e.details.key.repeat_count = kev->getRepeatCount();
             e.details.key.down_time = kev->getDownTime();
             e.details.key.event_time = kev->getEventTime();
+#if ANDROID_VERSION_MAJOR<=4
             e.details.key.is_system_key = kev->isSystemKey();
+#elif ANDROID_VERSION_MAJOR==5
+            e.details.key.is_system_key = false; /*kev->isSystemKey();*/
+#endif
             break;
         }
         case AINPUT_EVENT_TYPE_MOTION:
@@ -919,7 +923,16 @@ struct SessionService : public ubuntu::ui::SessionService
                 display,
                 &info);
 
+#if ANDROID_VERSION_MAJOR<=4
         screenshot_client.update(display, info.w / 2, info.h / 2, layer_min, layer_max);
+#elif ANDROID_VERSION_MAJOR==5
+        /* useIdentityTransform Replace whatever transformation (rotation,
+         * scaling, translation) the surface layers are currently using with the
+         * identity transformation while taking the screenshot.
+         */
+        bool useIdentityTransform = false;
+        screenshot_client.update(display, Rect(), info.w / 2, info.h / 2, layer_min, layer_max, useIdentityTransform);
+#endif
 
         ALOGI("screenshot: (%d, %d, %d, %d)\n", props.left, props.top, props.right, props.bottom);
         if (props.left == 0 && props.top == 0 && props.right == 0 && props.bottom == 0)

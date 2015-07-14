@@ -5,6 +5,7 @@ ANDROID_VERSION_MINOR := $(word 2, $(subst ., , $(PLATFORM_VERSION)))
 ANDROID_VERSION_PATCH := $(word 3, $(subst ., , $(PLATFORM_VERSION)))
 
 HAS_LIBINPUTSERVICE := $(shell test $(ANDROID_VERSION_MAJOR) -eq 4 -a $(ANDROID_VERSION_MINOR) -gt 2 && echo true)
+IS_ANDROID_5 := $(shell test $(ANDROID_VERSION_MAJOR) -eq 5 && echo true)
 
 include $(CLEAR_VARS)
 
@@ -20,6 +21,10 @@ LOCAL_CFLAGS += -std=gnu++0x
 LOCAL_C_INCLUDES := \
 	$(UPAPI_PATH)/include \
 	$(UPAPI_PATH)/android/include
+
+ifeq ($(IS_ANDROID_5),true)
+LOCAL_C_INCLUDES += bionic/libc/kernel/uapi
+endif
 
 LOCAL_SRC_FILES := \
 	ubuntu_application_api_for_hybris.cpp \
@@ -222,6 +227,13 @@ LOCAL_C_INCLUDES := \
 	$(UPAPI_PATH)/include \
 	$(UPAPI_PATH)/android/include
 
+ifeq ($(IS_ANDROID_5),true)
+LOCAL_C_INCLUDES += \
+	frameworks/native/services \
+	frameworks/base/libs
+endif
+
+
 LOCAL_SRC_FILES:= \
 	application_manager.cpp \
 	default_application_manager.cpp \
@@ -243,6 +255,14 @@ LOCAL_SHARED_LIBRARIES := \
 
 ifeq ($(HAS_LIBINPUTSERVICE),true)
 LOCAL_SHARED_LIBRARIES += libinputservice
+endif
+
+ifeq ($(IS_ANDROID_5),true)
+LOCAL_SHARED_LIBRARIES += \
+	libui \
+	libinputflinger \
+	libinputservice
+
 endif
 
 include $(BUILD_EXECUTABLE)

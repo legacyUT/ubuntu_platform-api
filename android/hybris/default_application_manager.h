@@ -28,11 +28,15 @@
 #include <binder/IServiceManager.h>
 #include <binder/ProcessState.h>
 
+#if ANDROID_VERSION_MAJOR==4
 #include <input/InputListener.h>
 #include <input/InputReader.h>
 #if ANDROID_VERSION_MAJOR==4 && ANDROID_VERSION_MINOR<=2
 #include <androidfw/InputTransport.h>
-#else
+#endif // ANDROID_VERSION_MAJOR==4 && ANDROID_VERSION_MINOR<=2
+#else // ANDROID_VERSION_MAJOR==4
+#include <inputflinger/InputListener.h>
+#include <inputflinger/InputReader.h>
 #include <input/InputTransport.h>
 #endif
 #include <utils/threads.h>

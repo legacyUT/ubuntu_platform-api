@@ -141,9 +141,14 @@ struct ApplicationSession : public android::RefBase
                  props.top, 
                  props.right, 
                  props.bottom);
-            
+
+#if ANDROID_VERSION_MAJOR==4
             SkRegion touchable_region;
             touchable_region.setRect(props.left, props.top, props.right+1, props.bottom+1);
+#else
+            android::Region touchable_region;
+            touchable_region.set(android::Rect(props.left, props.top, props.right+1, props.bottom+1));
+#endif
             
             mInfo->name = parent->app_name;
             mInfo->layoutParamsFlags = android::InputWindowInfo::FLAG_NOT_TOUCH_MODAL;

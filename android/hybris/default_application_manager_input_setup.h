@@ -18,10 +18,18 @@
 #ifndef DEFAULT_APPLICATION_MANAGER_INPUT_SETUP_H_
 #define DEFAULT_APPLICATION_MANAGER_INPUT_SETUP_H_
 
+#if ANDROID_VERSION_MAJOR==4 && ANDROID_VERSION_MINOR<=4
 #include <input/InputDispatcher.h>
 #include <input/InputListener.h>
 #include <input/InputManager.h>
 #include <input/InputReader.h>
+#else
+#include <inputflinger/InputDispatcher.h>
+#include <inputflinger/InputListener.h>
+#include <inputflinger/InputManager.h>
+#include <inputflinger/InputReader.h>
+#endif
+
 #include <input/PointerController.h>
 #include <input/SpriteController.h>
 #include <gui/ISurfaceComposer.h>
@@ -42,10 +50,20 @@ public:
 
     DefaultPointerControllerPolicy()
     {
+#if ANDROID_VERSION_MAJOR<=4
         bitmap.setConfig(
             SkBitmap::kARGB_8888_Config,
             bitmap_width,
             bitmap_height);
+#elif ANDROID_VERSION_MAJOR==5
+        SkColorType ct = SkBitmapConfigToColorType(SkBitmap::kARGB_8888_Config);
+        bitmap.setInfo(
+            SkImageInfo::Make(bitmap_width,
+            bitmap_height,
+            ct,
+            SkAlphaType::kPremul_SkAlphaType),
+            0);
+#endif
         bitmap.allocPixels();
 
         // Icon for spot touches
@@ -145,13 +163,24 @@ public:
         mInputDevices = inputDevices;
     }
 
-    virtual sp<KeyCharacterMap> getKeyboardLayoutOverlay(const String8& inputDeviceDescriptor) {
+#if ANDROID_VERSION_MAJOR<=4
+        virtual sp<KeyCharacterMap> getKeyboardLayoutOverlay(const String8& inputDeviceDescriptor) {
+#elif ANDROID_VERSION_MAJOR==5
+        virtual sp<KeyCharacterMap> getKeyboardLayoutOverlay(const InputDeviceIdentifier& identifier) {
+#endif
         return NULL;
     }
 
     virtual String8 getDeviceAlias(const InputDeviceIdentifier& identifier) {
         return String8::empty();
     }
+
+#if ANDROID_VERSION_MAJOR==5
+        virtual TouchAffineTransformation getTouchAffineTransformation(const String8& inputDeviceDescriptor, int32_t surfaceRotation) {
+                return android::TouchAffineTransformation();
+        }
+#endif
+
 private:
     android::sp<android::Looper> looper;
     int default_layer_for_touch_point_visualization;
@@ -372,8 +401,13 @@ struct InputSetup : public android::RefBase
             if (mInfo == NULL)
             {
                 mInfo = new android::InputWindowInfo();
+#if ANDROID_VERSION_MAJOR==4
                 SkRegion touchable_region;
                 touchable_region.setRect(x, y, x+w, y+h);
+#else
+                Region touchable_region;
+                touchable_region.set(Rect(x, y, x+w, y+h));
+#endif
                 
                 mInfo->name = "ShellInputWindow";
                 mInfo->layoutParamsFlags = android::InputWindowInfo::FLAG_NOT_TOUCH_MODAL | android::InputWindowInfo::FLAG_SPLIT_TOUCH;
