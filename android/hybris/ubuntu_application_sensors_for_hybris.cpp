@@ -47,6 +47,10 @@ typedef android::KeyedVector<
 uint32_t,
 ubuntu::application::sensors::SensorType> BackwardSensorTypeLut;
 
+#if ANDROID_VERSION_MAJOR>=6
+android::String16 UbuntuPackage("ubuntu");
+#endif
+
 static ForwardSensorTypeLut init_forward_sensor_type_lut()
 {
     static ForwardSensorTypeLut lut;
@@ -266,7 +270,12 @@ struct SensorService : public ubuntu::application::sensors::SensorService
     }
 
     SensorService() :
+#if ANDROID_VERSION_MAJOR>=6
+        // TODO: check package name
+        sensor_event_queue(android::SensorManager::getInstanceForPackage(UbuntuPackage).createEventQueue()),
+#else
         sensor_event_queue(android::SensorManager::getInstance().createEventQueue()),
+#endif
         looper(new android::Looper(false)),
         event_loop(new ubuntu::application::EventLoop(looper))
     {
@@ -293,9 +302,16 @@ ubuntu::platform::shared_ptr<SensorService> instance;
 ubuntu::application::sensors::Sensor::Ptr ubuntu::application::sensors::SensorService::sensor_for_type(
     ubuntu::application::sensors::SensorType type)
 {
+#if ANDROID_VERSION_MAJOR>=6
+    // TODO: check package name
+    const android::Sensor* sensor =
+        android::SensorManager::getInstanceForPackage(ubuntu::application::sensors::hybris::UbuntuPackage).getDefaultSensor(
+            hybris::forward_sensor_type_lut.valueFor(type));
+#else
     const android::Sensor* sensor =
         android::SensorManager::getInstance().getDefaultSensor(
             hybris::forward_sensor_type_lut.valueFor(type));
+#endif
 
     if (sensor == NULL)
         return Sensor::Ptr();
